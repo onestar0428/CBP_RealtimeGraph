@@ -1,0 +1,176 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<html>
+
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="//cdn.jsdelivr.net/excanvas/r3/excanvas.compiled.js"></script>
+    <script src="//cdn.jsdelivr.net/jquery.flot/0.8.3/jquery.flot.min.js"></script>
+
+    <style type="text/css">
+        #next {
+            display: inline-block;
+            text-decoration: none;
+            color: white;
+            padding: 2.5px;
+        }
+
+        div#wrapper {
+            width: 1000px;
+            height: 1000px;
+            background-color: white;
+            border: none;
+        }
+
+        div {
+            border: solid 1px;
+        }
+
+        div.profile {
+            width: 180px;
+            height: 200px;
+            margin-left: 8px;
+            margin-top: 8px;
+            float: left;
+            background-color: green;
+        }
+
+        div.info {
+            width: 200px;
+            height: 200px;
+            margin-left: 100px;
+            margin-top: 8px;
+            margin-right: 8px;
+            float: left;
+            background-color: blue;
+        }
+
+        div.graph {
+            float: left;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- tab1 -->
+        <ul class="nav nav-tabs">
+            <li class="active"><a data-toggle="pill" href="#menu1">실시간</a></li>
+            <li><a data-toggle="pill" href="#menu2">날짜별</a></li>
+        </ul>
+
+        <div class="tab-content">
+            <!-- pane:실시간 -->
+            <div id="menu1" class="tab-pane fade in active">
+                <h3>실시간 그래프</h3>
+                <p>그래프1</p>
+
+                <div id="wrapper">
+                    <!-- 그래프 UI -->
+                    <div id="graph" style="width:100%;height:40%;">
+                        <!-- 여기 아래부터가 그래프를 그리는 코드 -->
+                        <script language="javascript" type="text/javascript">
+                            $(function() {
+                                var data_ch1, data_ch2;
+
+                                for (var i = 0; i < data1.length; ++i) {
+                                    data_ch1.push([i, data1[i]]);
+                                    data_ch2.push([i, data2[i]]);
+                                }
+
+                                var options = {
+                                    series: {
+                                        shadowSize: 0 // Drawing is faster without shadows
+                                    },
+                                    yaxis: {
+                                        min: 0,
+                                        max: 5000
+                                    },
+                                    xaxis: {
+                                        min: data_ch1[0][0],
+                                        max: data_ch1[-1][0]
+                                    },
+                                    lines: {
+                                        show: true
+                                    },
+                                    points: {
+                                        show: true
+                                    }
+                                };
+                                var totalPoints = 300;
+
+                                // Set up the control widget
+                                var updateInterval = 1000;
+                                $("#updateInterval").val(updateInterval).change(function() {
+                                    var v = $(this).val();
+                                    if (v && !isNaN(+v)) {
+                                        updateInterval = +v;
+                                        if (updateInterval < 1) {
+                                            updateInterval = 1;
+                                        } else if (updateInterval > 2000) {
+                                            updateInterval = 2000;
+                                        }
+                                        $(this).val("" + updateInterval);
+                                    }
+                                });
+
+                                var plot = $.plot("#graph", [{
+                                            label: "ch1",
+                                            data: data_ch1
+                                        },
+                                        {
+                                            label: "ch2",
+                                            data: data_ch2
+                                        }
+                                    ],
+                                    options);
+                                    setTimeout(getData, updateInterval);
+                                });
+
+                                function update(response) {
+                                    alert(response.data1);
+                                    if ((response.data1 != data_ch1[-1]) &&
+                                        (response.data2 != data_ch2[-1])) {
+                                        plot.setData(function() {
+                                            return [{
+                                                    data1: data_ch1.push([data_ch1.length, response.data1])
+                                                },
+                                                {
+                                                    data2: data_ch2.push([data_ch2.length, response.data2])
+                                                }
+                                            ];
+                                        });
+                                        plot.draw();
+                                        setTimeout(getData, updateInterval);
+                                    }
+                                }
+
+                                function getData() {
+                                    $.ajax({
+                                        type: "GET",
+                                        url: "{% url 'get_realtime_data' %}",
+                                        success: update,
+                                        error: function(request, status, error) {
+                                            alert("ERROR: AJAX")
+                                        }
+                                    });
+                                }
+                        </script>
+                    </div>
+                </div>
+            </div>
+
+            <!-- pane:날짜별 -->
+            <div id="menu2" class="tab-pane fade">
+                <h3>날짜별 그래프</h3>
+                <p>그래프2</p>
+                <div id=graph>
+                    <!-- 여기 아래부터가 그래프를 그리는 코드 -->
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,174 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<html lang="en">
+
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="//cdn.jsdelivr.net/excanvas/r3/excanvas.compiled.js"></script>
+    <script src="//cdn.jsdelivr.net/jquery.flot/0.8.3/jquery.flot.min.js"></script>
+    <script src="//www.amcharts.com/lib/3/amcharts.js"></script>
+    <script src="//www.amcharts.com/lib/3/serial.js"></script>
+    <script src="//www.amcharts.com/lib/3/themes/light.js"></script>
+
+    <style type="text/css">
+        #next {
+            display: inline-block;
+            text-decoration: none;
+            color: white;
+            padding: 2.5px;
+        }
+
+        div#wrapper {
+            width: 1000px;
+            height: 1000px;
+            background-color: white;
+            border: none;
+        }
+
+        div {
+            border: solid 1px;
+        }
+
+        div.profile {
+            width: 180px;
+            height: 200px;
+            margin-left: 8px;
+            margin-top: 8px;
+            float: left;
+            background-color: green;
+        }
+
+        div.info {
+            width: 200px;
+            height: 200px;
+            margin-left: 100px;
+            margin-top: 8px;
+            margin-right: 8px;
+            float: left;
+            background-color: blue;
+        }
+
+        div.graph {
+            float: left;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- tab1 -->
+        <ul class="nav nav-tabs">
+            <li class="active"><a data-toggle="pill" href="#menu1">실시간</a></li>
+            <li><a data-toggle="pill" href="#menu2">날짜별</a></li>
+        </ul>
+
+        <div class="tab-content">
+            <!-- pane:실시간 -->
+            <div id="menu1" class="tab-pane fade in active">
+                <h3>실시간 그래프</h3>
+                <p>그래프1</p>
+
+                <div id="wrapper">
+                    <!-- 그래프 UI -->
+                    <!-- https://www.amcharts.com/kbase/real-time-data/ -->
+                    <div id="graph" style="width:100%;height:40%;">
+                        <script language="javascript" type="text/javascript">
+                            var day = 0;
+                            var firstDate = new Date();
+                            firstDate.setDate(firstDate.getDate() - 500);
+
+                            function generateChartData() {
+                                var chartData = [];
+                                for (day = 0; day < 50; day++) {
+                                    var newDate = new Date(firstDate);
+                                    newDate.setDate(newDate.getDate() + day);
+
+                                    var visits = Math.round(Math.random() * 40) - 20;
+
+                                    chartData.push({
+                                        "date": newDate,
+                                        "visits": visits
+                                    });
+                                }
+
+                                return chartData;
+                            }
+
+                            var chart = AmCharts.makeChart("chartdiv", {
+                                "type": "serial",
+                                "theme": "light",
+                                "zoomOutButton": {
+                                    "backgroundColor": '#000000',
+                                    "backgroundAlpha": 0.15
+                                },
+                                "dataProvider": generateChartData(),
+                                "categoryField": "date",
+                                "categoryAxis": {
+                                    "parseDates": true,
+                                    "minPeriod": "DD",
+                                    "dashLength": 1,
+                                    "gridAlpha": 0.15,
+                                    "axisColor": "#DADADA"
+                                },
+                                "graphs": [{
+                                    "id": "g1",
+                                    "valueField": "visits",
+                                    "bullet": "round",
+                                    "bulletBorderColor": "#FFFFFF",
+                                    "bulletBorderThickness": 2,
+                                    "lineThickness": 2,
+                                    "lineColor": "#b5030d",
+                                    "negativeLineColor": "#0352b5",
+                                    "hideBulletsCount": 50
+                                }],
+                                "chartCursor": {
+                                    "cursorPosition": "mouse"
+                                },
+                                "chartScrollbar": {
+                                    "graph": "g1",
+                                    "scrollbarHeight": 40,
+                                    "color": "#FFFFFF",
+                                    "autoGridCount": true
+                                }
+                            });
+
+                            setInterval(function() {
+                                // normally you would load new datapoints here,
+                                // but we will just generate some random values
+                                // and remove the value from the beginning so that
+                                // we get nice sliding graph feeling
+
+                                // remove datapoint from the beginning
+                                chart.dataProvider.shift();
+
+                                // add new one at the end
+                                day++;
+                                var newDate = new Date(firstDate);
+                                newDate.setDate(newDate.getDate() + day);
+                                var visits = Math.round(Math.random() * 40) - 20;
+                                chart.dataProvider.push({
+                                    date: newDate,
+                                    visits: visits
+                                });
+                                chart.validateData();
+                            }, 1000);
+                        </script>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- pane:날짜별 -->
+            <div id="menu2" class="tab-pane fade">
+                <h3>날짜별 그래프</h3>
+                <p>그래프2</p>
+                <div id=graph>
+                    <!-- 여기 아래부터가 그래프를 그리는 코드 -->
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

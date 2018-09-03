@@ -1,0 +1,176 @@
+CTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<html lang="en">
+
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <!--[if lte IE 8]><script language="javascript" type="text/javascript" src="excanvas.min.js"></script><![endif]-->
+
+    <style type="text/css">
+        #next {
+            display: inline-block;
+            text-decoration: none;
+            color: white;
+            padding: 2.5px;
+        }
+
+        div#wrapper {
+            width: 1000px;
+            height: 1000px;
+            background-color: white;
+            border: none;
+        }
+
+        div {
+            border: solid 1px;
+        }
+
+        div.profile {
+            width: 180px;
+            height: 200px;
+            margin-left: 8px;
+            margin-top: 8px;
+            float: left;
+            background-color: green;
+        }
+
+        div.info {
+            width: 200px;
+            height: 200px;
+            margin-left: 100px;
+            margin-top: 8px;
+            margin-right: 8px;
+            float: left;
+            background-color: blue;
+        }
+
+        div.graph {
+            float: left;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- tab1 -->
+        <ul class="nav nav-tabs">
+            <li class="active"><a data-toggle="pill" href="#menu1">실시간</a></li>
+            <li><a data-toggle="pill" href="#menu2">날짜별</a></li>
+        </ul>
+
+        <div class="tab-content">
+            <!-- pane:실시간 -->
+            <div id="menu1" class="tab-pane fade in active">
+                <h3>실시간 그래프</h3>
+                <p>그래프1</p>
+
+                <div id="wrapper">
+                    <!-- 사용자 정보는 나중에
+                    <div class="profile">
+                        <center>
+                            <img src="profile.jpg" width="150" , height="170" vspace="15" alt="profile photo"></center>
+                    </div>
+                    <div class="info"> <br> &nbsp이름&nbsp&nbsp&nbsp&nbsp Jihwan <br><br><br> &nbsp나이&nbsp&nbsp&nbsp&nbsp 26 <br><br><br> &nbsp몸무게&nbsp&nbsp&nbspbox 30 <br>
+                    </div> -->
+
+                    <!-- 그래프 UI -->
+                    <div id="graph" style="width:600px;height:300px">
+                        <canvas id="myChart">
+                        <!-- 여기 아래부터가 그래프를 그리는 코드 -->
+                        <canvas id="myChart"></canvas>
+                        <script type="text/javascript">
+                        var plot = $.plot(graph, {{data}}, options)
+                        </script>
+
+                        <script language="javascript" type="text/javascript" src="../../jquery.js"></script>
+                    	<script language="javascript" type="text/javascript" src="../../jquery.flot.js"></script>
+                    	<script type="text/javascript">
+
+                    	$(function() {
+                    		var data = {{{ data }}},
+                    			totalPoints = 300;
+                    		// Set up the control widget
+
+                    		var updateInterval = 30;
+                    		$("#updateInterval").val(updateInterval).change(function () {
+                    			var v = $(this).val();
+                    			if (v && !isNaN(+v)) {
+                    				updateInterval = +v;
+                    				if (updateInterval < 1) {
+                    					updateInterval = 1;
+                    				} else if (updateInterval > 2000) {
+                    					updateInterval = 2000;
+                    				}
+                    				$(this).val("" + updateInterval);
+                    			}
+                    		});
+
+                    		var plot = $.plot("#placeholder", [ data ], {
+                    			series: {
+                    				shadowSize: 0	// Drawing is faster without shadows
+                    			},
+                    			yaxis: {
+                    				min: 0,
+                    				max: 100
+                    			},
+                    			xaxis: {
+                    				show: false
+                    			}
+                    		});
+                            $.plot("#placeholder", [{
+                            			data: {{data[0]}},
+                            			lines: { show: true, fill: true }
+                            		}, {
+                            			data: {{data[1]}},
+                            			bars: { show: true }
+                            		}
+                                ]);
+                    		function update() {
+
+                    			plot.setData(data);
+
+                    			// Since the axes don't change, we don't need to call plot.setupGrid()
+
+                    			plot.draw();
+                    			setTimeout(update, updateInterval);
+                    		}
+
+                    		update();
+
+                    		// Add the Flot version string to the footer
+                            $("#footer").prepend("Flot " + $.plot.version + " &ndash; ");
+                    	});
+
+                    	</script>
+                    </div>
+
+                </div>
+
+            	<div id="content">
+
+            		<div class="demo-container">
+            			<div id="placeholder" class="demo-placeholder"></div>
+            		</div>
+                    <p>Time between updates: <input id="updateInterval" type="text" value="" style="text-align: right; width:5em"> milliseconds</p>
+                </div>
+
+            	<div id="footer">
+            		Copyright &copy; 2007 - 2014 IOLA and Ole Laursen
+            	</div>
+            </div>
+
+            <!-- pane:날짜별 -->
+            <div id="menu2" class="tab-pane fade">
+                <h3>날짜별 그래프</h3>
+                <p>그래프2</p>
+                <div id=graph>
+                    <!-- 여기 아래부터가 그래프를 그리는 코드 -->
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
